@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-PT">
+<head><meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QUA · Amarra | Comunidade AG20 Covilhã</title>
+
+<!-- ícone do separador do browser -->
+<link rel="icon" type="image/png" href="icone.png">
+<!-- ícone do ecrã principal no iPhone/iPad -->
+<link rel="apple-touch-icon" sizes="180x180" href="https://agr20covilha.github.io/amarra/pioneiros_qua/amarra-180-v3.png"><link rel="apple-touch-icon-precomposed" sizes="180x180" href="https://agr20covilha.github.io/amarra/pioneiros_qua/amarra-180-v3.png">
+<!-- e no Android/Chrome, pelo manifesto -->
+<link rel="manifest" href="manifesto.json">
+<meta name="theme-color" content="#2A5977">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Amarra">
+<meta name="robots" content="noindex">
+
+<style>
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#2A5977}
+  /* A app encosta-se POR BAIXO das horas: aqui, na página de fora, o iOS dá a
+     medida da barra (dentro do iframe não dá). A faixa das horas fica na cor
+     da secção, que é o fundo desta página. 13-10-2026. */
+  /* ALTURA EXPLÍCITA — 14-10-2026. Um iframe não estica entre top e bottom
+     (é um elemento substituído: fica com os 150 px de origem). No iPhone não se
+     via; no computador a app ficava numa tira e o resto da página em azul. */
+  iframe{position:fixed;left:0;top:env(safe-area-inset-top,0px);width:100%;
+    height:calc(100% - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));border:0;display:block}
+  /* a faixa da barra de gestos (em baixo) na cor da barra de navegação da app,
+     para a app e a casca lerem como uma peça só */
+  #base{position:fixed;left:0;right:0;bottom:0;height:env(safe-area-inset-bottom,0px);background:#ffffff}
+  @media (prefers-color-scheme:dark){#base{background:#151b23}}
+  /* enquanto o Apps Script arranca (costuma demorar 1-2 s na primeira vez) */
+  #espera{position:fixed;inset:0;display:flex;flex-direction:column;gap:14px;
+    align-items:center;justify-content:center;background:#2A5977;color:#ffffff;
+    font:600 15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    transition:opacity .35s}
+  #espera img{width:76px;height:76px;border-radius:18px}
+  #espera.fora{opacity:0;pointer-events:none}
+  #plano-b{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+    background:#0e1822;color:#c9d5df;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:9;white-space:nowrap}
+  #plano-b a{color:#fff}
+</style>
+<script src="../estado.js"></script>
+</head>
+<body>
+<div id="base"></div>
+<div id="espera"><img src="icone.png" alt=""><span>A abrir a Amarra…</span></div>
+<iframe id="app" title="Amarra" data-src="https://script.google.com/a/macros/escutismo.pt/s/AKfycbwG5Ns9QE8tTpMUAqIBqZtQtuK-w84bjr_PYcP-uaaVDfLKl4Rne8nFDw8HY75xGP81/exec"
+        allow="clipboard-write; fullscreen"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
+<div id="plano-b" hidden>Não abre? <a target="_top" rel="noopener">Abrir a Amarra diretamente</a></div>
+<script>
+  /* A app avisa quando arrancou (postMessage «amarra:pronta», sem dados).
+     Se o aviso não chegar, o que abriu no iframe foi a página de erro do Google
+     Drive — acontece no Chrome com várias contas Google com sessão aberta.
+     1.º recurso, sozinho: reabrir a app num iframe SEM CREDENCIAIS (Chrome
+        110+), como visita anónima — o erro deixa de acontecer; o preço é a
+        sessão da app não ficar guardada entre visitas NESSE browser;
+     2.º recurso: mostrar a ligação para abrir a app na janela inteira. */
+  var f = document.getElementById('app'), e = document.getElementById('espera'),
+      b = document.getElementById('plano-b'), pronta = false, semCredenciais = false;
+  var endereco = f.getAttribute('data-src');
+  b.querySelector('a').href = endereco;
+  function sair(){ e.className = 'fora'; }
+  window.addEventListener('message', function(m){
+    if (m && m.data && m.data.amarra === 'pronta') { pronta = true; b.hidden = true; sair(); }
+  });
+  function vigiar(fr){
+    fr.addEventListener('load', function(){
+      setTimeout(sair, 250);
+      setTimeout(function(){
+        if (pronta) return;
+        if (!semCredenciais && 'credentialless' in HTMLIFrameElement.prototype) {
+          semCredenciais = true;
+          var n = document.createElement('iframe');
+          n.id = 'app'; n.title = 'Amarra'; n.setAttribute('credentialless', '');
+          n.setAttribute('allow', 'clipboard-write; fullscreen');
+          n.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+          fr.replaceWith(n); vigiar(n); n.src = endereco;
+        } else b.hidden = false;
+      }, 5000);
+    });
+  }
+  function arrancar(){
+    vigiar(f); f.src = endereco;
+    setTimeout(sair, 8000);   /* rede má: mais vale mostrar o que houver */
+  }
+  /* SÓ ABRE SE A SECÇÃO ESTIVER ABERTA — 15-10-2026 (caderno §5.0-C). Antes de
+     carregar a app pergunta-se-lhe se o Chefe já a abriu a todos (estado.js,
+     gerado pelo atalho-site.js). Fechada: a página «em breve», que volta para
+     aqui sozinha quando abrir. Sem resposta: abre na mesma — quem guarda a
+     porta é o servidor, não esta página. */
+  /* OS DIRIGENTES ENTRAM SEMPRE — 15-10-2026. Com a app só para dirigentes,
+     a página «em breve» tem «Dirigente da secção? Entrar →» (./?dirigente).
+     Fica lembrado neste browser (ou neste ícone do ecrã principal, que no iOS
+     tem a sua própria memória): o mesmo link passa a abrir a app. Não é uma
+     porta: um elemento que carregue ali chega à app e é barrado por ela. */
+  var chave = 'amarra-dirigente:' + location.pathname, dirigente = /[?&]dirigente\b/.test(location.search);
+  try {
+    if (dirigente) { localStorage.setItem(chave, '1'); history.replaceState(null, '', location.pathname); }
+    else dirigente = localStorage.getItem(chave) === '1';
+  } catch (err) {}
+  if (dirigente || !window.AmarraEstado) arrancar();
+  else AmarraEstado.perguntar(endereco, function (aberta) {
+    if (aberta === false) location.replace('em-breve.html'); else arrancar();
+  });
+</script>
+</body>
+</html>
