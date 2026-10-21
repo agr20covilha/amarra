@@ -41,7 +41,6 @@
   #plano-b{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
     background:#0e1822;color:#c9d5df;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:9;white-space:nowrap}
-  #plano-b a{color:#fff}
 </style>
 <script src="../estado.js"></script>
 </head>
@@ -51,7 +50,7 @@
 <iframe id="app" title="Amarra" data-src="https://script.google.com/a/macros/escutismo.pt/s/AKfycbwG5Ns9QE8tTpMUAqIBqZtQtuK-w84bjr_PYcP-uaaVDfLKl4Rne8nFDw8HY75xGP81/exec"
         allow="clipboard-write; fullscreen"
         referrerpolicy="no-referrer-when-downgrade"></iframe>
-<div id="plano-b" hidden>Não abre? <a target="_top" rel="noopener">Abrir a Amarra diretamente</a></div>
+<div id="plano-b" hidden>Não abriu? Experimente numa janela privada.</div>
 <script>
   /* A app avisa quando arrancou (postMessage «amarra:pronta», sem dados).
      Se o aviso não chegar, o que abriu no iframe foi a página de erro do Google
@@ -59,11 +58,11 @@
      1.º recurso, sozinho: reabrir a app num iframe SEM CREDENCIAIS (Chrome
         110+), como visita anónima — o erro deixa de acontecer; o preço é a
         sessão da app não ficar guardada entre visitas NESSE browser;
-     2.º recurso: mostrar a ligação para abrir a app na janela inteira. */
+     2.º recurso: um aviso, só texto. Nunca uma ligação para o endereço do
+        Google: a app abre-se sempre pelo atalho (21-10-2026). */
   var f = document.getElementById('app'), e = document.getElementById('espera'),
       b = document.getElementById('plano-b'), pronta = false, semCredenciais = false;
   var endereco = f.getAttribute('data-src');
-  b.querySelector('a').href = endereco;
   function sair(){ e.className = 'fora'; }
   window.addEventListener('message', function(m){
     if (m && m.data && m.data.amarra === 'pronta') { pronta = true; b.hidden = true; sair(); }
