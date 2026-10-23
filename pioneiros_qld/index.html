@@ -19,6 +19,15 @@
 
 <style>
   html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#2A5977}
+  /* O iOS 26 ENCURTA A JANELA — 23-10-2026 (WebKit 301108). No ecrã principal, com a barra
+     translúcida, a janela vem mais curta do que o ecrã, a altura das horas, e o que está fixo
+     em baixo é cortado: a barra dos separadores sem os nomes e uma faixa da cor da casca por
+     baixo (reportado pelo Diogo). O iOS só dá a janela inteira quando a página é pelo menos
+     tão alta como o ecrã: a página passa a ter essa altura. O min() evita que, com a barra
+     opaca, a página fique a rolar (WebKit 316008). */
+  @media (display-mode: standalone){
+    html{height:min(100lvh, calc(100% + env(safe-area-inset-top,0px)))}
+  }
   /* A APP OCUPA O ECRÃ INTEIRO — 22-10-2026. Até aqui a casca encostava a app por
      baixo das horas e por cima da barra de gestos. O iOS recente passou a dar essas
      medidas também dentro do iframe e a app recuava outra vez: faixas a dobrar, em cima
