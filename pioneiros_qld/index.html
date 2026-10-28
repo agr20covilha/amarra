@@ -86,13 +86,22 @@
     try { appJanela.postMessage({amarra:'margens', topo:parseFloat(c.paddingTop) || 0,
                                  base:parseFloat(c.paddingBottom) || 0}, '*'); } catch (err) {}
   }
-  /* A altura só se fixa no iPhone pelo ecrã principal, onde a janela vem mais curta do
-     que o ecrã. Em todos os outros (Android incluído) fica a do CSS, 100% da janela: é
-     o que deixa o teclado encolher a app como deve. */
+  /* A altura só se fixa no iPhone pelo ecrã principal. Em todos os outros (Android e iPad
+     incluídos) fica a do CSS, 100% da janela: é o que deixa o teclado encolher a app como
+     deve, e no iPad a janela pode ser mais pequena do que o ecrã (Split View).
+     A JANELA ERRADA DOS DOIS LADOS — 28-10-2026. Até aqui só se corrigia a janela mais
+     curta do que o ecrã (iOS 26.0). Num iPhone 16 Pro a janela passou a vir MAIS ALTA do
+     que o ecrã, a altura das horas a mais, e a barra dos separadores ficava cortada em
+     baixo, sem os nomes (reportado pelo Diogo). No iPhone pelo ecrã principal a app ocupa
+     sempre o ecrã físico, seja qual for a janela que o iOS dá: o iframe tem a altura do
+     ecrã (ao alto, o lado comprido; deitado, o curto). */
   function ajustar(){
-    var curta = navigator.standalone && window.innerHeight > window.innerWidth && screen.height > window.innerHeight;
+    var iphone = navigator.standalone && /iPhone|iPod/.test(navigator.userAgent || '');
+    var alto = window.innerHeight > window.innerWidth;
+    var ecra = alto ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+    var fixar = iphone && ecra > 0 && Math.abs(window.innerHeight - ecra) > 1;
     [].forEach.call(document.querySelectorAll('iframe'), function(x){
-      if (curta) x.style.height = screen.height + 'px'; else x.style.removeProperty('height'); });
+      if (fixar) x.style.height = ecra + 'px'; else x.style.removeProperty('height'); });
     enviarMargens();
   }
   window.addEventListener('resize', ajustar);
