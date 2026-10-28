@@ -22,7 +22,7 @@
   /* O iOS 26 ENCURTA A JANELA — 23-10-2026 (WebKit 301108). No ecrã principal, com a barra
      translúcida, a janela vem mais curta do que o ecrã, a altura das horas, e o que está fixo
      em baixo é cortado: a barra dos separadores sem os nomes e uma faixa da cor da casca por
-     baixo (reportado pelo Diogo). O iOS só dá a janela inteira quando a página é pelo menos
+     baixo (reportado pelo autor). O iOS só dá a janela inteira quando a página é pelo menos
      tão alta como o ecrã: a página passa a ter essa altura. O min() evita que, com a barra
      opaca, a página fique a rolar (WebKit 316008). */
   @media (display-mode: standalone){
@@ -31,7 +31,7 @@
   /* A APP OCUPA O ECRÃ INTEIRO — 22-10-2026. Até aqui a casca encostava a app por
      baixo das horas e por cima da barra de gestos. O iOS recente passou a dar essas
      medidas também dentro do iframe e a app recuava outra vez: faixas a dobrar, em cima
-     e em baixo (reportado pelo Diogo, iPhone pelo ecrã principal). Agora a app vai de
+     e em baixo (reportado pelo autor, iPhone pelo ecrã principal). Agora a app vai de
      cima a baixo e a casca diz-lhe as medidas (postMessage «amarra:margens»): quem
      recua é só ela, com o fundo do cabeçalho e da barra de baixo.
      ALTURA EXPLÍCITA (14-10-2026): um iframe não estica entre top e bottom (é um
@@ -92,7 +92,7 @@
      A JANELA ERRADA DOS DOIS LADOS — 28-10-2026. Até aqui só se corrigia a janela mais
      curta do que o ecrã (iOS 26.0). Num iPhone 16 Pro a janela passou a vir MAIS ALTA do
      que o ecrã, a altura das horas a mais, e a barra dos separadores ficava cortada em
-     baixo, sem os nomes (reportado pelo Diogo). No iPhone pelo ecrã principal a app ocupa
+     baixo, sem os nomes (reportado pelo autor). No iPhone pelo ecrã principal a app ocupa
      sempre o ecrã físico, seja qual for a janela que o iOS dá: o iframe tem a altura do
      ecrã (ao alto, o lado comprido; deitado, o curto). */
   function ajustar(){
