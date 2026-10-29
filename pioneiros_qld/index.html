@@ -40,16 +40,6 @@
   iframe{position:fixed;left:0;top:0;width:100%;height:100%;border:0;display:block}
   #medida{position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;
     padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-  /* O DESFOQUE DO iOS 26 POR CIMA DO NOME — 29-10-2026. No ecrã principal, com a barra
-     translúcida, o iOS 26 põe o seu desfoque («Liquid Glass») na parte de cima da página, um
-     pouco abaixo das horas: o nome no cabeçalho aparecia desfocado (reportado pelo autor; no
-     Safari não). O iOS só o dispensa quando, NA PÁGINA DE CIMA, uma faixa fixa a toda a largura
-     pinta essa zona de uma cor sólida; o cabeçalho da app não conta, está dentro do iframe.
-     Esta faixa tem a altura das horas e a cor do cabeçalho da app (a corTopo da secção): por
-     cima da app não se vê diferença. Fora do ecrã principal a margem é 0 e a faixa não existe;
-     não deixa de passar toques (pointer-events). */
-  #faixa-topo{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);
-    background:#2A5977;z-index:5;pointer-events:none}
   /* enquanto o Apps Script arranca (costuma demorar 1-2 s na primeira vez) */
   #espera{position:fixed;inset:0;display:flex;flex-direction:column;gap:14px;
     align-items:center;justify-content:center;background:#2A5977;color:#ffffff;
@@ -65,7 +55,6 @@
 </head>
 <body>
 <div id="medida"></div>
-<div id="faixa-topo"></div>
 <div id="espera"><img src="icone.png" alt=""><span>A abrir a Amarra…</span></div>
 <iframe id="app" title="Amarra" data-src="https://script.google.com/a/macros/escutismo.pt/s/AKfycbwG5Ns9QE8tTpMUAqIBqZtQtuK-w84bjr_PYcP-uaaVDfLKl4Rne8nFDw8HY75xGP81/exec"
         allow="clipboard-write; fullscreen"
@@ -94,8 +83,16 @@
   function enviarMargens(){
     if (!appJanela) return;
     var c = getComputedStyle(document.getElementById('medida'));
+    /* A RAMPA DO iOS 26 — 29-10-2026. No ecrã principal o iOS 26 desenha o seu desfoque
+       («Liquid Glass») POR CIMA da página, das horas até cerca de 30 pt abaixo delas: o nome no
+       cabeçalho e o título da entrada ficavam desfocados (reportado pelo autor; no Safari não).
+       Não há CSS nem <meta> que o desligue, e uma faixa sólida aqui na casca não chegou (a de
+       29-10 saiu: pintava de azul a entrada e o desfoque continuava por baixo dela). O que
+       resulta é não ter texto nessa zona: a casca manda à app uma rampa, e a app recua-a com o
+       fundo do próprio cabeçalho. Só no iPhone pelo ecrã principal; nos outros é 0. */
+    var rampa = navigator.standalone && /iPhone|iPod/.test(navigator.userAgent || '') ? 32 : 0;
     try { appJanela.postMessage({amarra:'margens', topo:parseFloat(c.paddingTop) || 0,
-                                 base:parseFloat(c.paddingBottom) || 0}, '*'); } catch (err) {}
+                                 base:parseFloat(c.paddingBottom) || 0, rampa:rampa}, '*'); } catch (err) {}
   }
   /* A altura só se fixa no iPhone pelo ecrã principal. Em todos os outros (Android e iPad
      incluídos) fica a do CSS, 100% da janela: é o que deixa o teclado encolher a app como
